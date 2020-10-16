@@ -17,10 +17,7 @@ function Vue(options = {}) {
       }
     })
   })
-
-  console.log('this', this)
 }
-
 
 // defineProperty的缺点：
 // （1）只能劫持对象的属性，并且是已存在的属性，新增则无法劫持到
@@ -33,10 +30,11 @@ function Observe(data) {
       configurable: true,
       enumerable: true, // 必须为true，否则后面无法枚举
       get() {
+        console.log('获取', key, '值：', val)
         return val // 不能使用data[key]，否则会循环调用get方法
       },
       set(newVal) {
-        // console.log('newVal', newVal)
+        console.log('设置', key, '值：', newVal)
         if (newVal === val) {
           return
         }
@@ -48,8 +46,6 @@ function Observe(data) {
 }
 
 function observe(data) {
-  // console.log(data)
-  // console.log(typeof data)
   if (!data || typeof data !== 'object') {
     return
   }
