@@ -17,11 +17,14 @@ function Vue(options = {}) {
       }
     })
   })
+
+  new Compile(this._el, this)
 }
 
 // defineProperty的缺点：
 // （1）只能劫持对象的属性，并且是已存在的属性，新增则无法劫持到
 // （2）无法监听到数组内部变化，数组长度变化等
+//  vue如何实现对 数组方法push等的变异 请查看 arr.js 文件
 function Observe(data) {
   Object.keys(data).forEach(key => {
     let val = data[key]
@@ -51,6 +54,68 @@ function observe(data) {
   }
   new Observe(data)
   return
+}
+
+// 编译
+function Compile(el, vm) {
+  vm._el = document.querySelector(el)
+
+  let fragment = document.createDocumentFragment() // 创建虚拟DOM
+  let child
+
+  // 将真实DOM移入到虚拟DOM中
+  while (child = vm._el.firstChild) {
+    fragment.appendChild(child)
+  }
+
+  const replace = function (frag) {
+
+    Array.from(frag.childNodes).forEach((node) => {
+      let reg = /\{\{(.*?)\}\}/g
+      let text = node.textContent
+
+      // console.log('text', text)
+      // console.log('node.nodeType', node.nodeType)
+      // console.log('reg.test(text)', reg.test(text))
+
+      // 文本节点并且存在{{}}字符
+      if (node.nodeType === 3 && reg.test(text)) {
+        let arr = RegExp.$1.split('.')
+        let val = vm
+
+        // 如果dom存在 {{a.b}} 则获取到a对象的b属性值
+        arr.forEach(key => {
+          val = val[key]
+        })
+
+        // 将文本内容 替换
+        node.textContent = text.replace(reg, val).trim()
+      }
+
+      // 元素节点
+      if (node.nodeType === 1) {
+        let nodeAttr = node.attributes
+        Array.from(nodeAttr).forEach(att => {
+          let name = att.name
+          let exp = att.value
+          // console.log('att.name', att.name)
+          // console.log('att.value', att.value)
+          if (name.includes('v-model')) {
+            node.value = vm[exp]
+          }
+        })
+      }
+
+      if (node.childNodes && node.childNodes.length) {
+        replace(node)
+      }
+      
+    })
+  }
+
+  replace(fragment)
+  // 将虚拟DOM重新导入到真实DOM中
+  vm._el.appendChild(fragment)
 }
 
 function Dep() {

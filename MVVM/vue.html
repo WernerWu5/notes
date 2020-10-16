@@ -5,17 +5,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mvvm</title>
+  <style>
+    #app {
+      width: 1000px;
+      height: 500px;
+      margin: 200px auto;
+      text-align: center;
+    }
+  </style>
+
 </head>
 
 <body>
   <div id="app">
-    <span>{{name}}}</span>
+    {{name}}
+    <div>{{age}}</div>
+    <input type="text" v-model="price">
   </div>
   <script src="./vue.js"></script>
   <script>
     let vm = new Vue({
+      el: '#app',
       data: {
         name: 'W',
+        age: '18',
+        price: '无价'
       }
     })
   </script>
