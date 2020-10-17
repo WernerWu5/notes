@@ -35,7 +35,7 @@ function Observe(data) {
       enumerable: true, // 必须为true，否则后面无法枚举
       get() {
         console.log('获取', key, '值：', val)
-        Dep.target && dep.add(Dep.target)
+        Dep.target && dep.add(Dep.target) // 订阅
         return val // 不能使用data[key]，否则会循环调用get方法
       },
       set(newVal) {
@@ -44,7 +44,7 @@ function Observe(data) {
           return
         }
         val = newVal
-        dep.notify(newVal)
+        dep.notify(newVal) // 发布
         observe(val) // 判断newVal是否为对象
       }
     })
@@ -157,7 +157,7 @@ function Watcher(vm, exp, fn) {
   Dep.target = this
   let val = vm
   let arr = exp.split('.')
-  arr.forEach(exp => {
+  arr.forEach(exp => { // 触发数据劫持，以便Dep存储
     val = val[exp]
   })
   Dep.target = null
