@@ -1,0 +1,3 @@
+
+**vuedraggable** 拖放添加
+**awe-dnd** 拖放
